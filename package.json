@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SeanJoudrie/dream.git"
+    "url": "git+https://github.com/Joudrie/dream.git"
   },
   "bugs": {
-    "url": "https://github.com/SeanJoudrie/dream/issues"
+    "url": "https://github.com/Joudrie/dream/issues"
   },
-  "homepage": "https://github.com/SeanJoudrie/dream#readme",
+  "homepage": "https://github.com/Joudrie/dream#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0"
   },
