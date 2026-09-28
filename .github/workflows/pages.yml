@@ -1,5 +1,5 @@
 # Publishes the app (public/) to GitHub Pages on every push to main.
-# Live at https://seanjoudrie.github.io/dream/
+# Live at https://joudrie.github.io/dream/
 name: Deploy app to GitHub Pages
 
 on:
