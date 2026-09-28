@@ -542,7 +542,9 @@ function render() {
   $('#dim').style.opacity = onCapture ? DIM_LEVELS[settings.dim] ?? 0 : 0;
   $('#capture').hidden = !onCapture;
   $('#page').hidden = onCapture;
-  document.querySelector('meta[name=theme-color]').content = onCapture ? '#0a0912' : '#131120';
+  document.body.dataset.screen = onCapture ? 'capture' : 'page';
+  const css = getComputedStyle(document.documentElement);
+  document.querySelector('meta[name=theme-color]').content = css.getPropertyValue(onCapture ? '--night-bg' : '--bg').trim();
   if (onCapture) return paintCapture();
   const view = { journal: renderJournal, entry: renderEntry, explore: renderExplore, settings: renderSettings }[r.name];
   if (!view) return (location.hash = '#/');
@@ -553,7 +555,7 @@ function render() {
 // ─── journal ────────────────────────────────────────────────────────────────
 
 const journalView = { filter: 'all', query: '' };
-const FILTER_LABELS = { all: 'All', fav: 'Favorites', private: 'Private', trash: 'Trash' };
+const FILTER_LABELS = { all: 'All', fav: 'Starred', private: 'Private', trash: 'Trash' };
 
 function pageHead(back, backLabel, extra = '') {
   return `<header class="bar"><a class="link" href="${back}">${backLabel}</a><nav class="bar-right">${extra}</nav></header>`;
@@ -589,7 +591,7 @@ function renderJournal() {
 
 const EMPTY = {
   all: 'Nothing yet. The next dream you tell it goes here.',
-  fav: 'No favorites yet. Star a dream from its page.',
+  fav: 'Nothing starred yet. Star a dream from its page.',
   private: 'Nothing private. Any dream can be moved here from its page.',
   trash: 'Trash is empty. Deleted dreams wait here for 30 days.',
 };
@@ -610,9 +612,8 @@ function paintRows() {
         e.deletedAt ? `<span class="dot-tag">${daysLeft(e, now)}d left</span>` : '',
       ].join('');
       return `<li><a href="#/entry/${e.id}">
-        <div class="meta"><time>${formatWhen(e.createdAt)}</time>${e.fav ? '<span class="star" aria-label="favorite">★</span>' : ''}${dots}</div>
-        <h2>${esc(e.title || firstWords(text))}</h2>
-        <p class="preview">${esc(text)}</p>
+        <div class="meta"><time>${formatWhen(e.createdAt)}</time>${e.fav ? '<span class="starred">starred</span>' : ''}${dots}</div>
+        ${e.title ? `<h2>${esc(e.title)}</h2><p class="preview">${esc(text)}</p>` : `<p class="preview untitled">${esc(text)}</p>`}
         ${e.tags.length ? `<p class="tags">${e.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}
       </a></li>`;
     })
@@ -640,12 +641,12 @@ function renderEntry(id) {
           : ''
       }
       <time class="when">${formatWhen(e.createdAt)}</time>
-      <input id="title" class="title" value="${esc(e.title || '')}" placeholder="Untitled" aria-label="Title">
+      <textarea id="title" class="title" rows="1" placeholder="Untitled" aria-label="Title">${esc(e.title || '')}</textarea>
       <textarea id="text" class="dream" aria-label="Dream">${esc(textOf(e))}</textarea>
 
       <div class="actions">
         ${aiOk ? `<button type="button" class="quiet" id="tidy" data-confirm="replace your edits?">${e.polished ? 'Tidy again' : 'Tidy up the transcript'}</button>` : ''}
-        <button type="button" class="quiet" id="fav" aria-pressed="${e.fav}">${e.fav ? '★ Favorite' : '☆ Favorite'}</button>
+        <button type="button" class="quiet" id="fav" aria-pressed="${e.fav}">${e.fav ? 'Starred' : 'Star'}</button>
       </div>
 
       ${
@@ -673,12 +674,19 @@ function renderEntry(id) {
       ${e.deletedAt ? '' : '<button type="button" class="quiet danger" id="delete">Delete</button>'}
     </article>`;
 
+  grow($('#title'));
   grow($('#text'));
   grow($('#raw'));
   grow($('#note'));
 
   const save = debounce((fields) => patch(id, fields), 350);
-  on('#title', 'input', (ev) => save({ title: ev.target.value.trim() || null }));
+  // A title is one line of text that wraps; Enter moves on instead of adding a line.
+  on('#title', 'keydown', (ev) => ev.key === 'Enter' && (ev.preventDefault(), $('#text').focus()));
+  on('#title', 'input', (ev) => {
+    ev.target.value = ev.target.value.replace(/\n/g, ' ');
+    grow(ev.target);
+    save({ title: ev.target.value.trim() || null });
+  });
   on('#text', 'input', (ev) => {
     grow(ev.target);
     save(find(id).polished != null ? { polished: ev.target.value } : { raw: ev.target.value });

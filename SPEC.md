@@ -447,6 +447,7 @@ Recorded here rather than rewritten into the sections above. Full reasoning in `
 - **Capture:** a recording also ends on its own after 45 s with no new speech (saved, quieter tone). A running recognizer that hears nothing for 8 s counts as a dropout. Stop taps within 1.2 s of start are ignored. The Journal link is hidden while recording, and leaving the screen saves. Unfinished words are kept across recognizer restarts (closes §4.4's gap). A save is confirmed only once it's on disk. The dropout vibration ignores the Sounds toggle.
 - **Tidy (§6.2):** prompt revised: keeps the speaker's tense, doesn't split on false awakenings or mentions of other nights, keeps dream shape-shifts and dream repetition, fixes only obvious mishearings, never softens content. The model returns each dream's first few words (`starts_with`) and the code cuts the transcript there; the full original is kept in a new `source` field. "Tidy again" asks before replacing hand edits.
 - **Offline:** the font is self-hosted and the app shell loads cache-first.
+- **Design (§14, 2026-09-28):** the purple palette is gone, since purple is the most common tell of a vibe-coded site. The capture screen is warm near-black with dim parchment text (`#0c0b0a` / `#9c8f80`, newest words `#ddd0bd`). The daylight screens are warm paper and ink, following the phone's light or dark setting, with one brass accent. One 4-point spacing scale, six type sizes in rem, one 8px radius. Stars are words, not symbols. The page now has a description, a share image and home-screen icons.
 
 ---
 
