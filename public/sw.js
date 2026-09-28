@@ -1,7 +1,7 @@
 // Offline shell. Cache first: at 4am on one bar of signal the capture screen
 // must paint from the cache immediately, never wait on the network. A fresh
 // copy is fetched in the background and used on the next open.
-const CACHE = 'dream-v2';
+const CACHE = 'dream-v3';
 const SHELL = [
   './',
   'index.html',
